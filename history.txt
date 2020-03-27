@@ -6,3 +6,6 @@ pip freeze
 
 project superlists created by:
 django-admin.py startproject superlists .
+
+the book says:
+Functional Test == Acceptance Test == End-to-End Test
