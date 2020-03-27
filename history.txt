@@ -1,0 +1,8 @@
+requirements.txt is installed by:
+pip install -r requirements.txt
+
+and check:
+pip freeze
+
+project superlists created by:
+django-admin.py startproject superlists .
