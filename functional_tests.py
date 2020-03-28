@@ -29,6 +29,7 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys('Buy new shoes')  # selenium input
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
+        self.find_row_in_table('1: Buy new shoes')
 
         # user adds another item
         inputbox = self.browser.find_element_by_id('id_new_items')
@@ -36,16 +37,18 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        # Is there table with newly added item?
-        table = self.browser.find_element_by_id('id_list_table')
-        print(self.browser.page_source)
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy new shoes', [row.text for row in rows],
-                      f"New item was not added to the list.")
-        self.assertIn('2: Put the shoes on your ears', [row.text for row in rows],
-                      f"New item was not added to the list.")
+        # Are the items added to the table?
+        self.find_row_in_table('1: Buy new shoes')
+        self.find_row_in_table('2: Put the shoes on your ears')
 
         self.fail('You still have work to do here, dude!')
+
+    def find_row_in_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows],
+                      f"New item '{row_text}' was not added to the list.")
+
 
 if __name__ == '__main__':
     # starts the test runner tht find and executes test methods in test classes
