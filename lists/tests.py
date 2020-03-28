@@ -38,3 +38,8 @@ class HomePageTest(TestCase):
 
         # behold the magic power of Django's test client!
         self.assertTemplateUsed(response, 'index.html')
+
+    def test_can_save_post_request(self):
+        response = self.client.post('/', data={'item_text': 'New list item'})
+        self.assertIn('New list item', response.content.decode())
+        self.assertTemplateUsed(response, 'index.html')
