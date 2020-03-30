@@ -8,28 +8,6 @@ from lists.views import home_page
 
 class HomePageTest(TestCase):
 
-    def test_root_url_resolves_to_home_page_view(self):
-        """
-        This test is redundant after adding
-        test_home_page_returns_correct_html_with_test_client, that automatically
-        tests url resolve.
-        """
-        found = resolve('/')
-        self.assertEqual(found.func, home_page)
-
-    def test_home_page_returns_correct_html(self):
-        """
-        This is non-Djangoish version of the test, since it doesn't use
-        TestCase.client
-        """
-        request = HttpRequest()
-        response = home_page(request)  # instance of HttpResponse
-        html = response.content.decode('utf8')
-
-        self.assertTrue(html.startswith('<html>'))
-        self.assertIn('<title>To-Do lists</title>', html)
-        self.assertTrue(html.endswith('</html>'))
-
     def test_home_page_returns_correct_html_with_test_client(self):
         """ Use Django Test Client. Testing of html content = testing constants,
          which is wrong. Test whether the correct template was used, instead.
@@ -50,16 +28,27 @@ class HomePageTest(TestCase):
     def test_redirects_after_post(self):
         response = self.client.post('/', data={'item_text': 'New list item'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-list')
 
-    def test_show_all_list_items(self):
+    def test_only_saves_items_on_post(self):
+        self.client.get('/')
+        self.assertEqual(Item.objects.count(), 0)
+
+
+class ListViewTest(TestCase):
+
+    def test_list_uses_template(self):
+        response = self.client.get('/lists/the-list/')
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_show_all_items(self):
         Item.objects.create(text='item1')
         Item.objects.create(text='item2')
 
-        response = self.client.get('/')
+        response = self.client.get('/lists/the-list/')
 
-        self.assertIn('item1', response.content.decode())
-        self.assertIn('item2', response.content.decode())
+        self.assertContains(response, 'item1')
+        self.assertContains(response, 'item2')
 
 
 class ItemModelTest(TestCase):
@@ -82,7 +71,4 @@ class ItemModelTest(TestCase):
                          'The first bloody item in da list')
         self.assertEqual(second_saved_item.text, 'The second item in the list')
 
-    def test_only_saves_items_on_post(self):
-        self.client.get('/')
-        self.assertEqual(Item.objects.count(), 0)
 

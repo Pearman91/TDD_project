@@ -6,11 +6,11 @@ from lists.models import Item
 
 def home_page(request):
     if request.method == 'POST':
-        new_item_text = request.POST['item_text']
-        Item.objects.create(text=new_item_text)
-        context_dict = {'new_item_text': new_item_text}
-        return redirect('/')
+        Item.objects.create(text=request.POST['item_text'])
+        return redirect('/lists/the-list')
+    return render(request, 'index.html')
 
-    context_dict = {'items': Item.objects.all()}
-    return render(request, 'index.html', context=context_dict)
-    # return render(request, 'index.html')
+
+def view_lists(request):
+    items = Item.objects.all()
+    return render(request, 'list.html', context={'items': items})
