@@ -1,11 +1,12 @@
 import time
 
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self) -> None:
         self.browser = webdriver.Firefox()
 
@@ -13,7 +14,7 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         self.assertIn('To-Do', self.browser.title)
 
         # Is there the right h1 tag text?
@@ -49,7 +50,3 @@ class NewVisitorTest(unittest.TestCase):
         self.assertIn(row_text, [row.text for row in rows],
                       f"New item '{row_text}' was not added to the list.")
 
-
-if __name__ == '__main__':
-    # starts the test runner tht find and executes test methods in test classes
-    unittest.main(warnings='ignore')
