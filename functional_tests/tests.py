@@ -2,8 +2,11 @@ import time
 
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 import unittest
+
+MAX_WAIT = 3
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -29,24 +32,28 @@ class NewVisitorTest(LiveServerTestCase):
         # user adds item
         inputbox.send_keys('Buy new shoes')  # selenium input
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
-        self.find_row_in_table('1: Buy new shoes')
+        self.wait_for_row_in_table('1: Buy new shoes')
 
         # user adds another item
         inputbox = self.browser.find_element_by_id('id_new_items')
         inputbox.send_keys('Put the shoes on your ears')
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # Are the items added to the table?
-        self.find_row_in_table('1: Buy new shoes')
-        self.find_row_in_table('2: Put the shoes on your ears')
+        self.wait_for_row_in_table('1: Buy new shoes')
+        self.wait_for_row_in_table('2: Put the shoes on your ears')
 
         self.fail('You still have work to do here, dude!')
 
-    def find_row_in_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows],
-                      f"New item '{row_text}' was not added to the list.")
-
+    def wait_for_row_in_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element_by_id('id_list_table')
+                rows = table.find_elements_by_tag_name('tr')
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
