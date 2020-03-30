@@ -4,7 +4,7 @@
     </head>
     <body>
         <h1>Your To-Do lists</h1>
-        <form method="POST" action="/">
+        <form method="POST" action="/lists/new">
             {% csrf_token %}
             <input id="id_new_items" name="item_text" placeholder="Just write down sth.">
         </form>
