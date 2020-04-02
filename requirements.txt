@@ -1,1 +1,2 @@
 django<1.12
+gunicorn==20.0.4
