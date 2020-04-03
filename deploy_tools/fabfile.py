@@ -6,8 +6,16 @@ from fabric.api import cd, env, local, run
 REPO_URL = 'https://github.com/Pearman91/TDD_project.git'
 
 
-def deploy():
-    site_folder =f'/home/{env.user}/site/{env.host}'
+def deploy(hostname):
+    """
+    Let's assume you're a cheap bastard and didn't buy proper domain name and
+    you already used fake host name at some place on your server and for some
+    reason you keep doin' that.
+    # TODO: stop doin' that, dammit!!!
+    Anyways, from script folder run this:
+    fab deploy:host=luser@<ip-address>>,hostname=<fake_host_name>>
+    """
+    site_folder = f'/home/{env.user}/sites/{hostname}'
     run(f'mkdir -p {site_folder}')
     with cd(site_folder):
         _get_latest_source()
@@ -21,7 +29,7 @@ def _get_latest_source():
     if exists('.git'):
         run('git fetch')
     else:
-        run(f'git clone {REPO_URL} -')
+        run(f'git clone {REPO_URL} .')
     current_commit = local('git log -n 1 --format=%H', capture=True)
     run(f'git reset --hard {current_commit}')
 
@@ -29,7 +37,7 @@ def _get_latest_source():
 def _update_virtualenv():
     if not exists('virtualenv/bin/pip'):
         run(f'python3.6 -m venv virtualenv')
-    run('./virtualenv/bin/pip instal -r requirements.txt')
+    run('./virtualenv/bin/pip install -r requirements.txt')
 
 
 def _create_or_update_dotenv():
