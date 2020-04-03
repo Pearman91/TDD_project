@@ -1,9 +1,6 @@
-from django.http import HttpRequest
 from django.test import TestCase
-from django.urls import resolve
 
 from lists.models import Item, List
-from lists.views import home_page
 
 
 class HomePageTest(TestCase):
@@ -87,36 +84,4 @@ class NewItemTest(TestCase):
                                     data={'item_text': 'Added item'})
 
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
-
-
-class ListAndItemModelTest(TestCase):
-
-    def test_saving_and_retrieving_items(self):
-        list_ = List()
-        list_.save()
-
-        first_item = Item()
-        first_item.text = 'The first bloody item in da list'
-        first_item.list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'The second item in the list'
-        second_item.list = list_
-        second_item.save()
-
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text,
-                         'The first bloody item in da list')
-        self.assertEqual(first_saved_item.list, list_)
-        self.assertEqual(second_saved_item.text, 'The second item in the list')
-        self.assertEqual(second_saved_item.list, list_)
-
 
