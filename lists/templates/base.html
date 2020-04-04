@@ -23,6 +23,11 @@
                             <input id="id_new_items" name="item_text"
                                    class="form-control input-lg"
                                    placeholder="Just write down sth.">
+                            {% if error %}
+                                <div class="form-group has-error">
+                                    <span class="help-block">{{ error }}</span>
+                                </div>
+                            {% endif %}
                         </form>
                     </div>
                 </div>
