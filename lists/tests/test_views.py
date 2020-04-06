@@ -58,7 +58,7 @@ class ListViewTest(TestCase):
         correct_list = List.objects.create()
 
         response = self.client.post(f'/lists/{correct_list.id}/',
-                                    data={'item_text': 'Added item'})
+                                    data={'text': 'Added item'})
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
@@ -70,14 +70,14 @@ class ListViewTest(TestCase):
         correct_list = List.objects.create()
 
         response = self.client.post(f'/lists/{correct_list.id}/',
-                                    data={'item_text': 'Added item'})
+                                    data={'text': 'Added item'})
 
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
     def test_validation_error_redirect_on_adding(self):
         list_ = List.objects.create()
         response = self.client.post(
-            f'/lists/{list_.id}/', data={'item_text': ''})
+            f'/lists/{list_.id}/', data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'list.html')
         expected_error = escape("Nana, we won't let you put in empty items.")
@@ -87,18 +87,18 @@ class ListViewTest(TestCase):
 class NewListTest(TestCase):
 
     def test_can_save_post_request(self):
-        self.client.post('/lists/new', data={'item_text': 'New list item'})
+        self.client.post('/lists/new', data={'text': 'New list item'})
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'New list item')
 
     def test_redirects_after_post(self):
-        response = self.client.post('/lists/new', data={'item_text': 'New list item'})
+        response = self.client.post('/lists/new', data={'text': 'New list item'})
         new_list = List.objects.first()
         self.assertRedirects(response, f'/lists/{new_list.id}/')
 
     def test_validation_error_redirect(self):
-        response = self.client.post('/lists/new', data={'item_text': ''})
+        response = self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'index.html')
         # escape() is for django handling of strings with funky characters
@@ -106,7 +106,7 @@ class NewListTest(TestCase):
         self.assertContains(response, expected_error)
 
     def test_invalid_items_are_not_saved(self):
-        self.client.post('/lists/new', data={'item_text': ''})
+        self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
