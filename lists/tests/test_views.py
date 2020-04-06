@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.utils.html import escape
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
@@ -15,6 +16,10 @@ class HomePageTest(TestCase):
 
         # behold the magic power of Django's test client!
         self.assertTemplateUsed(response, 'index.html')
+
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
