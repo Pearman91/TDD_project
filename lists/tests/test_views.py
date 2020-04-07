@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.test import TestCase
 from django.utils.html import escape
 
@@ -90,6 +92,20 @@ class ListViewTest(TestCase):
         response = self.post_empty_input()
         expected_error = escape("Nana, we won't let you put in empty items.")
         self.assertContains(response, expected_error)
+
+    @skip('TODO next')
+    def test_duplicate_item_validation_errors_returns_to_list_page(self):
+        list_ = List.objects.create()
+        item = Item.objects.create(text='sometext', list=list_)
+
+        # try to post item with same text
+        response = self.client.post(
+            f'/lists/{list_.id}/', data={'text': 'sometext'})
+
+        expected_error = "You aready have this on your list."
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
 
     def test_shows_item_form(self):
         list_ = List.objects.create()
