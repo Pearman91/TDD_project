@@ -7,6 +7,11 @@ EMPTY_ITEM_ERROR = "Nana, we won't let you put in empty items."
 
 
 class ItemForm(forms.models.ModelForm):
+
+    def save(self, for_list):
+        self.instance.list = for_list
+        return super().save()
+
     class Meta:
         model = Item
         fields = ('text',)

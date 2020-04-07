@@ -94,7 +94,6 @@ class ListViewTest(TestCase):
     def test_shows_item_form(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        print(response.context['form'].as_p())
         self.assertIsInstance(response.context['form'], ItemForm)
         self.assertContains(response, 'name="text"')
 

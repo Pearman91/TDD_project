@@ -3,6 +3,7 @@ from unittest import skip
 from django.test import TestCase
 
 from lists.forms import EMPTY_ITEM_ERROR, ItemForm
+from lists.models import List
 
 
 class ItemFormTest(TestCase):
@@ -22,3 +23,8 @@ class ItemFormTest(TestCase):
         # form.is_valid calls form.full_clean -> validation
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR])
+
+    def test_form_saves_to_db(self):
+        list_ = List.objects.create()
+        form = ItemForm(data={'text': 'test this'})
+        new_item = form.save(for_list=list_)
