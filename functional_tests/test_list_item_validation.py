@@ -35,3 +35,17 @@ class ItemValidationTest(FunctionalTest):
         self.wait_for_row_in_table("1: Dance like nobody's watching")
         self.wait_for_row_in_table("2: And sing like nobody's listening")
 
+    def test_cannot_add_duplicate_item(self):
+        self.browser.get(self.live_server_url)
+
+        self.get_item_input_box().send_keys("Let's duplicate")
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for_row_in_table("1: Let's duplicate")
+
+        self.get_item_input_box().send_keys("Let's duplicate")
+        self.get_item_input_box().send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element_by_css_selector(".has-error").text,
+            "You aready have this on your list."))
+
