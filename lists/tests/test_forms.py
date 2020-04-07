@@ -8,11 +8,6 @@ from lists.models import List, Item
 
 class ItemFormTest(TestCase):
 
-    @skip('unfinished')
-    def test_form_renders_text_input(self):
-        form = ItemForm()
-        self.fail(form.as_p())
-
     def test_form_input_has_placeholder_and_css_classes(self):
         form = ItemForm()
         self.assertIn('class="form-control input-lg"', form.as_p())
@@ -28,6 +23,7 @@ class ItemFormTest(TestCase):
         list_ = List.objects.create()
         form = ItemForm(data={'text': 'test this'})
         form.save(for_list=list_)
+        self.assertEqual(Item.objects.all().count(), 1)
 
 
 class ExistingListItemFormTest(TestCase):
@@ -51,3 +47,8 @@ class ExistingListItemFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [DUPLICATE_ITEM_ERROR])
 
+    def test_form_save(self):
+        list_ = List.objects.create()
+        form = ExistingListItemForm(for_list=list_, data={'text': 'sometext'})
+        item = form.save()
+        self.assertEqual(item, Item.objects.all()[0])

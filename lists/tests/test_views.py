@@ -3,7 +3,8 @@ from unittest import skip
 from django.test import TestCase
 from django.utils.html import escape
 
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR, \
+    ExistingListItemForm
 from lists.models import Item, List
 
 
@@ -93,7 +94,6 @@ class ListViewTest(TestCase):
         expected_error = escape("Nana, we won't let you put in empty items.")
         self.assertContains(response, expected_error)
 
-    @skip('TODO next')
     def test_duplicate_item_validation_errors_returns_to_list_page(self):
         list_ = List.objects.create()
         item = Item.objects.create(text='sometext', list=list_)
@@ -102,7 +102,7 @@ class ListViewTest(TestCase):
         response = self.client.post(
             f'/lists/{list_.id}/', data={'text': 'sometext'})
 
-        expected_error = "You aready have this on your list."
+        expected_error = DUPLICATE_ITEM_ERROR
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
@@ -110,8 +110,12 @@ class ListViewTest(TestCase):
     def test_shows_item_form(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        response = self.post_empty_input()
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def post_empty_input(self):
         list_ = List.objects.create()
