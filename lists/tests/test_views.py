@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils.html import escape
 
-from lists.forms import ItemForm
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR
 from lists.models import Item, List
 
 
@@ -74,14 +74,32 @@ class ListViewTest(TestCase):
 
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
-    def test_validation_error_redirect_on_adding(self):
-        list_ = List.objects.create()
-        response = self.client.post(
-            f'/lists/{list_.id}/', data={'text': ''})
+    def test_for_invalid_item_not_saved_in_db(self):
+        self.post_empty_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_for_invalid_item_redirection_status_code(self):
+        response = self.post_empty_input()
         self.assertEqual(response.status_code, 200)
+
+    def test_for_invalid_item_redirection_template(self):
+        response = self.post_empty_input()
         self.assertTemplateUsed(response, 'list.html')
+
+    def test_for_invalid_item_error_message(self):
+        response = self.post_empty_input()
         expected_error = escape("Nana, we won't let you put in empty items.")
         self.assertContains(response, expected_error)
+
+    def test_shows_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertContains(response, 'name="text"')
+
+    def post_empty_input(self):
+        list_ = List.objects.create()
+        return self.client.post(f'/lists/{list_.id}/', data={'text': ''})
 
 
 class NewListTest(TestCase):
@@ -97,13 +115,20 @@ class NewListTest(TestCase):
         new_list = List.objects.first()
         self.assertRedirects(response, f'/lists/{new_list.id}/')
 
-    def test_validation_error_redirect(self):
+    def test_validation_error_redirect_to_template(self):
         response = self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'index.html')
+
+    def test_validation_error_message(self):
+        response = self.client.post('/lists/new', data={'text': ''})
         # escape() is for django handling of strings with funky characters
-        expected_error = escape("Nana, we won't let you put in empty items.")
+        expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
+
+    def test_validation_error_puts_form_in_template(self):
+        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertIsInstance(response.context['form'], ItemForm)
 
     def test_invalid_items_are_not_saved(self):
         self.client.post('/lists/new', data={'text': ''})
