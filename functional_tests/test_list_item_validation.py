@@ -47,6 +47,25 @@ class ItemValidationTest(FunctionalTest):
         self.get_item_input_box().send_keys(Keys.ENTER)
 
         self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector(".has-error").text,
+            self.get_error_element().text,
             DUPLICATE_ITEM_ERROR))
 
+    def test_error_messages_are_cleared_on_input(self):
+        self.browser.get(self.live_server_url)
+
+        self.get_item_input_box().send_keys("Duplicator")
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for_row_in_table("1: Duplicator")
+
+        # duplicate item entry
+        self.get_item_input_box().send_keys("Duplicator")
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for(lambda: self.assertTrue(
+            self.get_error_element().is_displayed()))
+
+        self.get_item_input_box().send_keys('a')
+        self.wait_for(lambda: self.assertFalse(
+            self.get_error_element().is_displayed()))
+
+    def get_error_element(self):
+        return self.browser.find_element_by_css_selector(".has-error")
