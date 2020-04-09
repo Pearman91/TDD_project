@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+import accounts.urls
 from lists import views as list_views
 import lists.urls
 
@@ -23,4 +24,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', list_views.home_page, name='home'),
     url(r'^lists/', include(lists.urls)),
+    url(r'^accounts/', include(accounts.urls))
 ]
