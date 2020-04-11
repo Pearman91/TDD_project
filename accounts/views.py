@@ -29,7 +29,7 @@ def send_login_email(request):
     Token.objects.create(email=email, uid=uid)
     print(f'saving uid {uid} for email {email}', file=sys.stderr)
     url = request.build_absolute_uri(f'/accounts/login?uid={uid}')
-    send_mail('Hi, you can log in to Superlists',
+    send_mail('Log in to Superlists!',
               f'Link to log in: {url}',
               'noreply@superlists',
               [email],)
