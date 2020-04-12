@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from .base import FunctionalTest
 
 TEST_EMAIL = 'hru3kus@gmail.com'
-SUBJECT = 'Log in to Superlists!'
+SUBJECT = 'Hi, you can log in to Superlists'
 
 
 class LoginTest(FunctionalTest):

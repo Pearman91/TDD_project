@@ -6,7 +6,7 @@ from accounts.models import Token
 
 User = get_user_model()
 
-EMAIL = 'franta@trabanta.cz'
+EMAIL = 'frantatrabanta@example.com'
 
 
 class UserModelTest(TestCase):
