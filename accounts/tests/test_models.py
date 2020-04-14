@@ -1,3 +1,4 @@
+from django.contrib import auth
 from django.contrib.auth  import get_user_model
 from django.test import TestCase
 
@@ -18,6 +19,12 @@ class UserModelTest(TestCase):
     def test_user_has_email_as_primary_key(self):
         user = User(email=EMAIL)
         self.assertEqual(user.pk, EMAIL)
+
+    def test_no_problem_with_missing_lastlogin_when_login(self):
+        user = User.objects.create(email=EMAIL)
+        user.backend = ''
+        request = self.client.request().wsgi_request
+        auth.login(request, user)  # won't raise => test passes
 
 
 class TokenModelTest(TestCase):
