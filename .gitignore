@@ -1,9 +1,11 @@
 db.sqlite3
 geckodriver.log
-venv
-.idea
-__pycache__
+/venv/
+/.idea/
+/__pycache__/
 *.pyc
 history.txt
 .env
 virtualenv
+/static/admin/
+/static/bootstrap/
