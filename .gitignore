@@ -7,5 +7,4 @@ geckodriver.log
 history.txt
 .env
 virtualenv
-/static/admin/
-/static/bootstrap/
+/static/
