@@ -14,15 +14,14 @@ Provisionig a new site
     
 ## Nginx virtual host config:
 * in nginx.template.conf replace *DOMAIN* with real domain name
-* rename the template it to *DOMAIN*
 * save it as */etc/nginx/sites-available/<*DOMAIN*>*
 * create symlink to the previous file in */etc/nginx/sites-enabled/<*DOMAIN*>*
 
 ## Systemd service:
 * in gunicorn-systemd.template.service replace *DOMAIN* with real domain name
 * rename the template to *DOMAIN.service*
-* save it as */etc/systemd/system/<*DOMAIN.service*>* and reload systemctl daemon
-* then you can enable it and start it
+* save it as */etc/systemd/system/gunicorn-<*DOMAIN*>.service* and reload systemctl daemon
+* then you can reload demon, enable the service and start it
 
 ## Folder structure:
 * for each DOMAIN, corresponding repository is to be cloned into /home/luser/sites/DOMAIN 
