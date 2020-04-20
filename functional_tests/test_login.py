@@ -12,6 +12,7 @@ SUBJECT = 'Hi, you can log in to Superlists'
 
 class LoginTest(FunctionalTest):
 
+    # TODO: fix this
     @skip('manually works; local test works; staging test doesnt due to '
           'inability to check mail')
     def test_can_get_email_link_to_log_in(self):

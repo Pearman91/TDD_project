@@ -26,6 +26,7 @@ def wait(fn):
 
 
 class FunctionalTest(StaticLiveServerTestCase):
+
     def setUp(self) -> None:
         self.browser = webdriver.Firefox()
         self.staging_server = os.environ.get('STAGING_SERVER')
@@ -61,3 +62,11 @@ class FunctionalTest(StaticLiveServerTestCase):
         navbar = self.browser.find_element_by_css_selector('.navbar')
         self.assertNotIn(email, navbar.text)
 
+    # TODO: use this function in other tests
+    def add_list_item(self, item_text):
+        num_rows = len(
+            self.browser.find_elements_by_css_selector('#id_list_table tr'))
+        self.get_item_input_box().send_keys(item_text)
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        items_number = num_rows + 1
+        self.wait_for_row_in_table(f'{items_number}: {item_text}')

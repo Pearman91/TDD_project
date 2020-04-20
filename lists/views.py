@@ -29,3 +29,8 @@ def new_list(request):
         return redirect(list_)
     else:
         return render(request, 'index.html', context={'form': form})
+
+
+def my_lists(request, email):
+    return render(request, 'my_lists.html')
+

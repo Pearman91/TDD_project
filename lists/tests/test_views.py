@@ -155,3 +155,11 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
+
+class MyListsTest(TestCase):
+
+    def test_my_list_url_renders_my_lists_template(self):
+        response = self.client.get('/lists/users/franta@trabanta.cz')
+        self.assertTemplateUsed(response, 'my_lists.html')
+
+
