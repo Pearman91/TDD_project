@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from lists.forms import ItemForm, ExistingListItemForm
+from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 from lists.models import Item, List
 
 User = get_user_model()
@@ -34,6 +34,14 @@ def new_list(request):
         return redirect(list_)
     else:
         return render(request, 'index.html', context={'form': form})
+
+
+def new_list2(request):
+    form = NewListForm(data=request.POST)
+    if form.is_valid():
+        list_ = form.save(owner=request.user)
+        return redirect(list_)
+    return render(request, 'index.html', context={'form': form})
 
 
 def my_lists(request, email):
