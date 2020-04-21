@@ -1,4 +1,5 @@
 from unittest import skip
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -158,6 +159,24 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
+    @patch('lists.views.List')
+    @patch('lists.views.ItemForm')  # mock List needs mock ItemForm
+    def test_list_owner_is_saved_if_user_is_authenticated(
+            self, mockItemFormClass, mockListClass
+    ):
+        user = User.objects.create(email='franta@trabanta.cz')
+        self.client.force_login(user)
+        # list instance
+        mock_list = mockListClass.return_value
+
+        def check_owner_assigned():
+            self.assertEqual(mock_list.owner, user)
+        mock_list.save.side_effect = check_owner_assigned
+
+        self.client.post('/lists/new', data={'text': 'mhmm...sandwiches'})
+
+        mock_list.save.assert_called_once_with()
+
 
 class MyListsTest(TestCase):
 
@@ -174,9 +193,3 @@ class MyListsTest(TestCase):
         response = self.client.get(f'/lists/users/{email}/')
         self.assertEqual(response.context['owner'], correct_user)
 
-    def test_list_owner_is_saved_if_user_is_authenticated(self):
-        user = User.objects.create(email='franta@trabanta.cz')
-        self.client.force_login(user)
-        self.client.post('/lists/new', data={'text': 'mhmm...sandwiches'})
-        list_ = List.objects.first()
-        self.assertEqual(list_.owner, user)
