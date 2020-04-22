@@ -50,6 +50,7 @@ class MyListsTest(FunctionalTest):
         second_list_url = self.browser.current_url
 
         # user clicks on 'My list' and see the new list, too
+        self.browser.find_element_by_link_text('My lists').click()
         self.wait_for(lambda:
                       self.browser.find_element_by_link_text('Buy groceries'))
         self.browser.find_element_by_link_text('Buy groceries').click()
@@ -59,7 +60,7 @@ class MyListsTest(FunctionalTest):
         # after logging out, there are no 'My lists' anymore
         self.browser.find_element_by_link_text('Log out').click()
         self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element_by_link_text('My lists'),
+            self.browser.find_elements_by_link_text('My lists'),
             []
         ))
 

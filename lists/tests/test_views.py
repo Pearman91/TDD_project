@@ -162,7 +162,6 @@ class NewListViewIntegratedTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
-    @skip('due to refactor')
     def test_list_owner_is_saved_if_user_is_authenticated(self):
         user = User.objects.create(email='franta@trabanta.cz')
         self.client.force_login(user)
@@ -181,7 +180,7 @@ class NewListViewUnitTest(unittest.TestCase):
         self.request.POST['text'] = 'new list item'
         self.request.user = Mock()
 
-    def test_passes_POST_data_to_NewLisForm(self, mockNewListForm):
+    def test_passes_POST_data_to_NewListForm(self, mockNewListForm):
         new_list2(self.request)
         mockNewListForm.assert_called_once_with(data=self.request.POST)
 
@@ -221,6 +220,7 @@ class NewListViewUnitTest(unittest.TestCase):
         new_list2(self.request)
 
         self.assertFalse(mock_form.save.called)
+
 
 class MyListsTest(TestCase):
 
