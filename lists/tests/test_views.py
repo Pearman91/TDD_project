@@ -10,7 +10,7 @@ from django.utils.html import escape
 from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR, \
     ExistingListItemForm
 from lists.models import Item, List
-from lists.views import new_list2
+from lists.views import new_list
 
 User = get_user_model()
 
@@ -137,30 +137,12 @@ class NewListViewIntegratedTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'New list item')
 
-    def test_redirects_after_post(self):
-        response = self.client.post('/lists/new', data={'text': 'New list item'})
-        new_list = List.objects.first()
-        self.assertRedirects(response, f'/lists/{new_list.id}/')
-
-    def test_validation_error_redirect_to_template(self):
+    def test_validation_error_message_and_no_save(self):
         response = self.client.post('/lists/new', data={'text': ''})
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'index.html')
-
-    def test_validation_error_message(self):
-        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertEqual(List.objects.count(), 0)
         # escape() is for django handling of strings with funky characters
         expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
-
-    def test_validation_error_puts_form_in_template(self):
-        response = self.client.post('/lists/new', data={'text': ''})
-        self.assertIsInstance(response.context['form'], ItemForm)
-
-    def test_invalid_items_are_not_saved(self):
-        self.client.post('/lists/new', data={'text': ''})
-        self.assertEqual(List.objects.count(), 0)
-        self.assertEqual(Item.objects.count(), 0)
 
     def test_list_owner_is_saved_if_user_is_authenticated(self):
         user = User.objects.create(email='franta@trabanta.cz')
@@ -181,13 +163,13 @@ class NewListViewUnitTest(unittest.TestCase):
         self.request.user = Mock()
 
     def test_passes_POST_data_to_NewListForm(self, mockNewListForm):
-        new_list2(self.request)
+        new_list(self.request)
         mockNewListForm.assert_called_once_with(data=self.request.POST)
 
     def test_saves_form_with_owner_if_form_valid(self, mockNewListForm):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = True
-        new_list2(self.request)
+        new_list(self.request)
         mock_form.save.assert_called_once_with(owner=self.request.user)
 
     @patch('lists.views.redirect')
@@ -196,7 +178,7 @@ class NewListViewUnitTest(unittest.TestCase):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = True
 
-        response = new_list2(self.request)
+        response = new_list(self.request)
 
         self.assertEqual(response, mock_redirect.return_value)
         mock_redirect.assert_called_once_with(mock_form.save.return_value)
@@ -207,7 +189,7 @@ class NewListViewUnitTest(unittest.TestCase):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = False
 
-        response = new_list2(self.request)
+        response = new_list(self.request)
 
         self.assertEqual(response, mock_render.return_value)
         mock_render.assert_called_once_with(
@@ -217,7 +199,7 @@ class NewListViewUnitTest(unittest.TestCase):
         mock_form = mockNewListForm.return_value
         mock_form.is_valid.return_value = False
 
-        new_list2(self.request)
+        new_list(self.request)
 
         self.assertFalse(mock_form.save.called)
 

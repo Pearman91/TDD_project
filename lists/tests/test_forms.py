@@ -22,12 +22,6 @@ class ItemFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR])
 
-    def test_form_saves_to_db(self):
-        list_ = List.objects.create()
-        form = ItemForm(data={'text': 'test this'})
-        form.save(for_list=list_)
-        self.assertEqual(Item.objects.all().count(), 1)
-
 
 class ExistingListItemFormTest(TestCase):
 
