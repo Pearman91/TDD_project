@@ -6,6 +6,9 @@ class List(models.Model):
     def get_absolute_url(self):
         return reverse('view_lists', args=[self.id])
 
+    def create_new(self):
+        pass
+
 
 class Item(models.Model):
     text = models.TextField(default='')
