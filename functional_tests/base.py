@@ -2,12 +2,14 @@ import os
 import time
 from unittest import skip
 
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 
-from .server_tools import reset_database
+from .server_tools import create_session_on_server, reset_database
+from .management.commands.create_session import create_preauthenticated_session
 
 MAX_WAIT = 10
 
@@ -70,3 +72,16 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.get_item_input_box().send_keys(Keys.ENTER)
         items_number = num_rows + 1
         self.wait_for_row_in_table(f'{items_number}: {item_text}')
+
+    def create_preauthenticated_session(self, email):
+        if self.staging_server:
+            session_key = create_session_on_server(self.staging_server, email)
+        else:
+            session_key = create_preauthenticated_session(email)
+
+        # visit page so cookie can be set - 404 is fastest to visit
+        self.browser.get(self.live_server_url + '/404-theres-no-such-thing')
+        self.browser.add_cookie({'name': settings.SESSION_COOKIE_NAME,
+                                 'value': session_key,
+                                 'path': '/',
+                                 })
