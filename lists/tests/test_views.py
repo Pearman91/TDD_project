@@ -220,3 +220,11 @@ class MyListsTest(TestCase):
         self.assertEqual(response.context['owner'], correct_user)
 
 
+class ShareListViewTest(TestCase):
+
+    def test_POST_redirects_to_list_page(self):
+        list_ = List.objects.create()
+        response = self.client.post(f'/lists/{list_.id}/share/')
+        self.assertRedirects(response, f'/lists/{list_.id}/')
+
+
